@@ -2,11 +2,13 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
+	"go.uber.org/zap"
+
 	"github.com/balac/backend-security-playground/internal/config"
+	applog "github.com/balac/backend-security-playground/internal/logger"
 )
 
 func main() {
@@ -20,8 +22,16 @@ func main() {
 		log.Fatalf("failed to load configuration: %v", err)
 	}
 
-	fmt.Printf(
-		"backend-security-playground: config loaded (env=%s, addr=%s, crypto.mode=%s); server bootstrap lands in a later commit\n",
-		cfg.Env, cfg.Server.Addr(), cfg.Crypto.Mode,
+	zapLogger, err := applog.New(cfg.Log)
+	if err != nil {
+		log.Fatalf("failed to initialize logger: %v", err)
+	}
+	defer zapLogger.Sync() //nolint:errcheck
+
+	zapLogger.Info("configuration loaded",
+		zap.String("env", cfg.Env),
+		zap.String("addr", cfg.Server.Addr()),
+		zap.String("crypto_mode", cfg.Crypto.Mode),
 	)
+	zapLogger.Info("server bootstrap lands in a later commit")
 }
