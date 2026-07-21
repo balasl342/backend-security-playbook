@@ -2,13 +2,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"go.uber.org/zap"
 
 	"github.com/balac/backend-security-playground/internal/config"
 	applog "github.com/balac/backend-security-playground/internal/logger"
+	"github.com/balac/backend-security-playground/internal/server"
 )
 
 func main() {
@@ -33,5 +37,13 @@ func main() {
 		zap.String("addr", cfg.Server.Addr()),
 		zap.String("crypto_mode", cfg.Crypto.Mode),
 	)
-	zapLogger.Info("server bootstrap lands in a later commit")
+
+	srv := server.New(cfg.Server, zapLogger, cfg.Env)
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	if err := srv.Run(ctx); err != nil {
+		zapLogger.Fatal("server exited with error", zap.Error(err))
+	}
 }
