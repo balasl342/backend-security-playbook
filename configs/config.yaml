@@ -1,0 +1,50 @@
+env: development
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+  idle_timeout: 60s
+  shutdown_timeout: 15s
+
+database:
+  host: localhost
+  port: 5432
+  user: playground
+  password: playground
+  name: playground
+  ssl_mode: disable
+  max_open_conns: 25
+  max_idle_conns: 5
+  conn_max_lifetime: 5m
+
+redis:
+  enabled: false
+  addr: localhost:6379
+  password: ""
+  db: 0
+
+log:
+  level: info
+  format: json
+
+crypto:
+  mode: envelope
+  kms_provider: local
+  local_master_key_path: configs/dev-master.key
+  aws_key_id: ""
+  aws_region: us-east-1
+
+secrets:
+  provider: env
+  file_path: configs/secrets.local.yaml
+  aws_region: us-east-1
+  vault_addr: http://localhost:8200
+  azure_vault_name: ""
+
+observability:
+  metrics_enabled: true
+  tracing_enabled: false
+  service_name: backend-security-playground
+  otlp_endpoint: localhost:4317
