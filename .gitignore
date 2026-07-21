@@ -1,0 +1,44 @@
+# Binaries
+/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/api
+/migrate-runner
+
+# Test artifacts
+*.test
+*.out
+coverage.html
+coverage.txt
+
+# Go workspace/module cache
+/vendor/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local secrets / dev keys
+/secrets/
+*.pem
+*.key
+!configs/*.example.yaml
+
+# Docker volumes data (if bind-mounted locally)
+/docker/data/
