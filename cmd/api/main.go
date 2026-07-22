@@ -7,13 +7,19 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"go.uber.org/zap"
 
 	"github.com/balac/backend-security-playground/internal/config"
+	"github.com/balac/backend-security-playground/internal/handler"
 	applog "github.com/balac/backend-security-playground/internal/logger"
 	"github.com/balac/backend-security-playground/internal/server"
 )
+
+// readinessTimeout bounds how long the /readyz endpoint waits on dependency
+// checks before considering the service not ready.
+const readinessTimeout = 3 * time.Second
 
 func main() {
 	configPath := os.Getenv("APP_CONFIG_PATH")
@@ -39,6 +45,11 @@ func main() {
 	)
 
 	srv := server.New(cfg.Server, zapLogger, cfg.Env)
+
+	// No dependency checkers are registered yet; the database and redis
+	// checkers are added once their respective clients are wired up.
+	healthHandler := handler.NewHealthHandler(readinessTimeout)
+	healthHandler.Register(srv.Engine())
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
